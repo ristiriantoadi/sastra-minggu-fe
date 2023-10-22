@@ -17,7 +17,7 @@ function Signup() {
     >
       <Card style={{ width: "800px", margin: "0 auto" }}>
         <Card.Body>
-          <h1 style={{ textAlign: "center" }}>Habit Tracker</h1>
+          <h1 style={{ textAlign: "center" }}>Sastra Minggu</h1>
           <Form>
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Form.Label>Email address</Form.Label>

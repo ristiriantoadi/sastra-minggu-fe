@@ -18,7 +18,7 @@ function Login() {
       <Card style={{ width: "800px", margin: "0 auto" }}>
         <Card.Body>
           <h1 className="card-title" style={{ textAlign: "center" }}>
-            Habit Tracker
+            Sastra Minggu
           </h1>
           <Form>
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
