@@ -6,8 +6,10 @@ import ButtonSubmit from "../../components/ButtonSubmit";
 function Signup() {
   const [errorConfirmPassword, setErrorConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [password, setPassword] = useState();
-  const [confirmPassword, setConfirmPassword] = useState();
+  const [disabled, setDisabled] = useState(true);
+  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   useEffect(() => {
     if (password !== confirmPassword) {
@@ -16,6 +18,22 @@ function Signup() {
       setErrorConfirmPassword(false);
     }
   }, [password, confirmPassword]);
+
+  useEffect(() => {
+    if (username === "") {
+      setDisabled(true);
+      return;
+    }
+    if (password === "") {
+      setDisabled(true);
+      return;
+    }
+    if (errorConfirmPassword === true) {
+      setDisabled(true);
+      return;
+    }
+    setDisabled(false);
+  }, [username, password, errorConfirmPassword]);
 
   return (
     <Container
@@ -35,7 +53,9 @@ function Signup() {
               <Form.Control
                 required
                 type="text"
-                placeholder="name@example.com"
+                onChange={(e) => {
+                  setUsername(e.target.value);
+                }}
               />
             </Form.Group>
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
@@ -73,7 +93,9 @@ function Signup() {
               />
             </Form.Group>
             <div style={{ display: "flex", alignItems: "center" }}>
-              <ButtonSubmit loading={loading}>Sign Up</ButtonSubmit>
+              <ButtonSubmit disabled={disabled} loading={loading}>
+                Sign Up
+              </ButtonSubmit>
               <Link style={{ marginLeft: "10px" }} to="/login">
                 Login
               </Link>
