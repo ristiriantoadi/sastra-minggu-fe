@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Card, Container, Form } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import ButtonSubmit from "../../components/ButtonSubmit";
+import { publicAxios } from "../../util/util-axios";
 
 function Signup() {
   const [errorConfirmPassword, setErrorConfirmPassword] = useState(false);
@@ -10,6 +11,7 @@ function Signup() {
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  let navigate = useNavigate();
 
   useEffect(() => {
     if (password !== confirmPassword) {
@@ -35,6 +37,37 @@ function Signup() {
     setDisabled(false);
   }, [username, password, errorConfirmPassword]);
 
+  const signup = async (username, password) => {
+    const url = "/guest/auth/register";
+    const headers = {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    };
+    const data = {
+      username,
+      password,
+      name: "test",
+    };
+
+    try {
+      await publicAxios.post(url, data, { headers });
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await signup(username, password);
+    } catch (error) {
+      setLoading(false);
+      return;
+    }
+    navigate("/login");
+  };
+
   return (
     <Container
       style={{
@@ -47,7 +80,7 @@ function Signup() {
       <Card style={{ width: "800px", margin: "0 auto" }}>
         <Card.Body>
           <h1 style={{ textAlign: "center" }}>Sastra Minggu</h1>
-          <Form>
+          <Form onSubmit={handleSubmit}>
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Form.Label>Username</Form.Label>
               <Form.Control
