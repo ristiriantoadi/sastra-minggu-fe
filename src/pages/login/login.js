@@ -5,6 +5,20 @@ import ButtonSubmit from "../../components/ButtonSubmit";
 
 function Login() {
   const [loading, setLoading] = useState(false);
+  const [username, setUsername] = useState();
+  const [password, setPassword] = useState();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await login(username, password);
+    } catch (error) {
+      setLoading(false);
+      return;
+    }
+  };
+
   return (
     <Container
       style={{
@@ -20,18 +34,22 @@ function Login() {
           <h1 className="card-title" style={{ textAlign: "center" }}>
             Sastra Minggu
           </h1>
-          <Form>
+          <Form onSubmit={handleSubmit}>
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
-              <Form.Label>Email address</Form.Label>
+              <Form.Label>Username</Form.Label>
               <Form.Control
                 required
-                type="email"
-                placeholder="name@example.com"
+                type="text"
+                onChange={(e) => setUsername(e.target.value)}
               />
             </Form.Group>
             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
               <Form.Label>Password</Form.Label>
-              <Form.Control required type="password" />
+              <Form.Control
+                required
+                type="password"
+                onChange={(e) => setPassword(e.target.value)}
+              />
             </Form.Group>
             <div style={{ display: "flex", alignItems: "center" }}>
               <ButtonSubmit loading={loading}>Login</ButtonSubmit>

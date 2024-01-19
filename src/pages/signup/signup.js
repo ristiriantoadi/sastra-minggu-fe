@@ -12,6 +12,7 @@ function Signup() {
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [name, setName] = useState("");
   let navigate = useNavigate();
 
   useEffect(() => {
@@ -35,23 +36,24 @@ function Signup() {
       setDisabled(true);
       return;
     }
-    setDisabled(false);
-  }, [username, password, errorConfirmPassword]);
+    if (name === "") {
+      setDisabled(true);
+      return;
+    }
 
-  const signup = async (username, password) => {
+    setDisabled(false);
+  }, [username, password, errorConfirmPassword, name]);
+
+  const signup = async (username, password, name) => {
     const url = "/guest/auth/register";
-    const headers = {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    };
     const data = {
       username,
       password,
-      name: "test",
+      name,
     };
 
     try {
-      await publicAxios.post(url, data, { headers });
+      await publicAxios.post(url, data);
     } catch (error) {
       return Promise.reject(error);
     }
@@ -61,7 +63,7 @@ function Signup() {
     e.preventDefault();
     setLoading(true);
     try {
-      await signup(username, password);
+      await signup(username, password, name);
     } catch (error) {
       setLoading(false);
       return;
@@ -99,6 +101,16 @@ function Signup() {
                 type="text"
                 onChange={(e) => {
                   setUsername(e.target.value);
+                }}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
+              <Form.Label>Nama</Form.Label>
+              <Form.Control
+                required
+                type="text"
+                onChange={(e) => {
+                  setName(e.target.value);
                 }}
               />
             </Form.Group>
