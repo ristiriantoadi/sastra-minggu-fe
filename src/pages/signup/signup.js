@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Card, Container, Form } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import ButtonSubmit from "../../components/ButtonSubmit";
 import { publicAxios } from "../../util/util-axios";
 
@@ -65,6 +66,16 @@ function Signup() {
       setLoading(false);
       return;
     }
+    toast.success("Berhasil daftar", {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "colored",
+    });
     navigate("/login");
   };
 
