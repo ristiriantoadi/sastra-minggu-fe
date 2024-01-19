@@ -6,7 +6,7 @@ function PrivateLayout() {
   const token = localStorage.getItem("token");
   return (
     <div>
-      <NavbarPrivate></NavbarPrivate>
+      {token ? <NavbarPrivate></NavbarPrivate> : null}
       <Container style={{ maxWidth: "90%", paddingTop: "20px" }}>
         {token ? <Outlet /> : <Navigate to="/login"></Navigate>}
       </Container>

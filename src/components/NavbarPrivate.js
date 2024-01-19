@@ -4,11 +4,13 @@ import { useEffect, useState } from "react";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
+import { useNavigate } from "react-router";
 import { privateAxios } from "../util/util-axios";
 
 function NavbarPrivate() {
   // const { currentUser, notifCount } = useContext(AuthContext);
   const [currentUser, setCurrentUser] = useState();
+  let navigate = useNavigate();
 
   const checkToken = async () => {
     try {
@@ -24,6 +26,11 @@ function NavbarPrivate() {
     // console.log("use effect called");
     checkToken();
   }, []);
+
+  const signOut = () => {
+    localStorage.removeItem("token");
+    navigate("/login");
+  };
 
   return (
     <Navbar
@@ -41,7 +48,7 @@ function NavbarPrivate() {
               <FontAwesomeIcon icon={faUser} style={{ marginRight: "5px" }} />
               {currentUser?.name}
             </span>
-            <Nav.Link>
+            <Nav.Link onClick={signOut}>
               <FontAwesomeIcon
                 icon={faSignOut}
                 style={{ marginRight: "5px" }}
