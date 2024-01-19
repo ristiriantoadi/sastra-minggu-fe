@@ -22,11 +22,17 @@ function Login() {
       },
     };
     try {
-      await publicAxios.post("/guest/auth/login", data, config);
+      const response = await publicAxios.post(
+        "/guest/auth/login",
+        data,
+        config
+      );
+      localStorage.setItem("token", response.data.access_token);
     } catch (error) {
       return Promise.reject(error);
     }
-    navigate("/home");
+    // localStorage.setItem("token", data["token"]);
+    navigate("/dashboard");
   };
 
   const handleSubmit = async (e) => {
