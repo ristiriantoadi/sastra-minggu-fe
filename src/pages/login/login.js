@@ -1,12 +1,33 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Card, Container, Form } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import ButtonSubmit from "../../components/ButtonSubmit";
+import { publicAxios } from "../../util/util-axios";
 
 function Login() {
   const [loading, setLoading] = useState(false);
-  const [username, setUsername] = useState();
-  const [password, setPassword] = useState();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [disabled, setDisabled] = useState(true);
+  let navigate = useNavigate();
+
+  const login = async (username, password) => {
+    const data = new URLSearchParams();
+    data.append("username", username);
+    data.append("password", password);
+    const config = {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    };
+    try {
+      await publicAxios.post("/guest/auth/login", data, config);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+    navigate("/home");
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -18,6 +39,14 @@ function Login() {
       return;
     }
   };
+
+  useEffect(() => {
+    if (username !== "" && password !== "") {
+      setDisabled(false);
+      return;
+    }
+    setDisabled(true);
+  }, [username, password]);
 
   return (
     <Container
@@ -52,7 +81,9 @@ function Login() {
               />
             </Form.Group>
             <div style={{ display: "flex", alignItems: "center" }}>
-              <ButtonSubmit loading={loading}>Login</ButtonSubmit>
+              <ButtonSubmit disabled={disabled} loading={loading}>
+                Login
+              </ButtonSubmit>
               <Link style={{ marginLeft: "10px" }} to="/signup">
                 Sign Up
               </Link>
