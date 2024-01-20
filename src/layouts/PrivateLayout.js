@@ -11,7 +11,7 @@ function PrivateLayout() {
       {token ? <NavbarPrivate></NavbarPrivate> : null}
       <Container style={{ maxWidth: "90%", paddingTop: "20px" }}>
         <Row>
-          <Col sm={2}>
+          <Col sm={2} style={{ marginBottom: "10px" }}>
             <ListGroup>
               <ListGroup.Item active={location.pathname === "/dashboard"}>
                 <Link

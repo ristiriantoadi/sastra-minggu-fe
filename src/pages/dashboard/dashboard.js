@@ -1,15 +1,26 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Button,
   Card,
   Col,
   Container,
   Form,
+  Modal,
   Row,
   Table,
 } from "react-bootstrap";
 
 function Dashboard() {
+  const [show, setShow] = useState(false);
+
+  const handleClose = () => {
+    setShow(false);
+  };
+
+  const handleOpen = () => {
+    setShow(true);
+  };
+
   return (
     <Container>
       <Row style={{ marginBottom: "10px" }}>
@@ -18,7 +29,7 @@ function Dashboard() {
             <Card.Title>Pencarian</Card.Title>
             <Form>
               <Row className="row">
-                <Col md={6}>
+                <Col md={6} style={{ marginBottom: "25px" }}>
                   <Form.Group>
                     <Form.Label>Judul</Form.Label>
                     <Form.Control type="text"></Form.Control>
@@ -31,11 +42,12 @@ function Dashboard() {
                   </Form.Group>
                 </Col>
               </Row>
-              <Row className="row">
+              <Row>
                 <Col md={6}>
-                  <Form.Group>
+                  <Form.Group style={{ marginBottom: "25px" }}>
                     <Form.Label>Jenis</Form.Label>
                     <Form.Select aria-label="Default select example">
+                      <option value="1">Semua</option>
                       <option value="1">Cerita Pendek</option>
                       <option value="2">Puisi</option>
                       <option value="3">Esai</option>
@@ -53,7 +65,7 @@ function Dashboard() {
                 <Form.Group>
                   <Form.Label>Tanggal Pemuatan</Form.Label>
                   <Row>
-                    <Col md={6}>
+                    <Col md={6} style={{ marginBottom: "10px" }}>
                       <Form.Control type="date"></Form.Control>
                     </Col>
                     <Col md={6}>
@@ -71,7 +83,67 @@ function Dashboard() {
       </Row>
       <Row>
         <Col>
-          <Button variant="primary">Tambah</Button>
+          <Button onClick={handleOpen} variant="primary">
+            Tambah
+          </Button>
+          <Modal size="xl" show={show} onHide={handleClose}>
+            <Modal.Header closeButton>
+              <Modal.Title>Tambah Karya</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <Form>
+                <Row className="row">
+                  <Col md={6} style={{ marginBottom: "10px" }}>
+                    <Form.Group>
+                      <Form.Label>Judul</Form.Label>
+                      <Form.Control type="text"></Form.Control>
+                    </Form.Group>
+                  </Col>
+                  <Col md={6}>
+                    <Form.Group>
+                      <Form.Label>Pengarang</Form.Label>
+                      <Form.Control type="text"></Form.Control>
+                    </Form.Group>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col md={6}>
+                    <Form.Group style={{ marginBottom: "10px" }}>
+                      <Form.Label>Jenis</Form.Label>
+                      <Form.Select aria-label="Default select example">
+                        <option value="1">Cerita Pendek</option>
+                        <option value="2">Puisi</option>
+                        <option value="3">Esai</option>
+                      </Form.Select>
+                    </Form.Group>
+                  </Col>
+                  <Col md={6}>
+                    <Form.Group>
+                      <Form.Label>Media</Form.Label>
+                      <Form.Control type="text"></Form.Control>
+                    </Form.Group>
+                  </Col>
+                </Row>
+                <Row className="row">
+                  <Col md={6}>
+                    <Form.Group>
+                      <Form.Label>Tanggal Pemuatan</Form.Label>
+                      <Form.Control type="date"></Form.Control>
+                    </Form.Group>
+                  </Col>
+                  <Col md={6}>
+                    <Form.Group>
+                      <Form.Label>Bukti Pemuatan</Form.Label>
+                      <Form.Control type="file"></Form.Control>
+                    </Form.Group>
+                  </Col>
+                </Row>
+                <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                  <Button>Tambah</Button>
+                </div>
+              </Form>
+            </Modal.Body>
+          </Modal>
         </Col>
       </Row>
       <Row>

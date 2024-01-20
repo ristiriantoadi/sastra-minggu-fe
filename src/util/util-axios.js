@@ -38,12 +38,10 @@ privateAxios.interceptors.request.use((config) => {
 privateAxios.interceptors.response.use(
   (response) => {
     // Modify the response data or perform any other post-processing
-    console.log("response", response);
     return response;
   },
   (error) => {
     // Handle response errors
-    console.error("private error", error);
     toast.error(getErrorMessage(error), {
       position: "top-right",
       autoClose: 3000,
