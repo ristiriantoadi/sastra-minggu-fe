@@ -12,6 +12,7 @@ import {
 
 function Dashboard() {
   const [show, setShow] = useState(false);
+  const [proofPublication, setProofPublication] = useState("link");
 
   const handleClose = () => {
     setShow(false);
@@ -134,7 +135,30 @@ function Dashboard() {
                   <Col md={6}>
                     <Form.Group>
                       <Form.Label>Bukti Pemuatan</Form.Label>
-                      <Form.Control type="file"></Form.Control>
+                      <div style={{ display: "flex", marginBottom: "5px" }}>
+                        <Form.Check
+                          type="radio"
+                          label="Gambar"
+                          style={{ marginRight: "10px" }}
+                          checked={proofPublication === "image"}
+                          onClick={() => {
+                            setProofPublication("image");
+                          }}
+                        />
+                        <Form.Check
+                          type="radio"
+                          label="Link"
+                          checked={proofPublication === "link"}
+                          onClick={() => {
+                            setProofPublication("link");
+                          }}
+                        />
+                      </div>
+                      {proofPublication === "image" ? (
+                        <Form.Control type="file"></Form.Control>
+                      ) : (
+                        <Form.Control type="text"></Form.Control>
+                      )}
                     </Form.Group>
                   </Col>
                 </Row>
