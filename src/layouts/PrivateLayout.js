@@ -1,5 +1,5 @@
 import { Col, Container, ListGroup, Nav, Row } from "react-bootstrap";
-import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { Link, Navigate, Outlet, useLocation } from "react-router-dom";
 import NavbarPrivate from "../components/NavbarPrivate";
 
 function PrivateLayout() {
@@ -14,14 +14,24 @@ function PrivateLayout() {
           <Col sm={2}>
             <ListGroup>
               <ListGroup.Item active={location.pathname === "/dashboard"}>
-                <Nav.Item>
-                  <Nav.Link href="/dashboard">Dashboard</Nav.Link>
-                </Nav.Item>
+                <Link
+                  className={
+                    location.pathname === "/dashboard" ? "link-active" : "link"
+                  }
+                  to="/dashboard"
+                >
+                  <Nav.Item>Dashboard</Nav.Item>
+                </Link>
               </ListGroup.Item>
               <ListGroup.Item active={location.pathname === "/karya-saya"}>
-                <Nav.Item>
-                  <Nav.Link href="/karya-saya">Karya Saya</Nav.Link>
-                </Nav.Item>
+                <Link
+                  className={
+                    location.pathname === "/karya-saya" ? "link-active" : "link"
+                  }
+                  to="/karya-saya"
+                >
+                  <Nav.Item>Karya Saya</Nav.Item>
+                </Link>
               </ListGroup.Item>
             </ListGroup>
           </Col>
