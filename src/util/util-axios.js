@@ -33,7 +33,6 @@ privateAxios.interceptors.request.use((config) => {
   // Modify the request configuration before it is sent
   const token = localStorage.getItem("token");
   config.headers.Authorization = `Bearer ${token}`;
-  console.log("config", config.headers.Authorization);
   return config;
 });
 privateAxios.interceptors.response.use(

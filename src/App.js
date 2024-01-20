@@ -5,6 +5,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import PrivateLayout from "./layouts/PrivateLayout";
 import Dashboard from "./pages/dashboard/dashboard";
+import MyWork from "./pages/my-work/MyWork";
 import Signup from "./pages/signup/signup";
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
         <Route path="/signup" element={<Signup></Signup>} />
         <Route element={<PrivateLayout></PrivateLayout>}>
           <Route path="/dashboard" element={<Dashboard></Dashboard>} />
+          <Route path="/karya-saya" element={<MyWork></MyWork>} />
         </Route>
       </Routes>
     </BrowserRouter>
