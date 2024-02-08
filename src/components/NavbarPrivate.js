@@ -29,7 +29,7 @@ function NavbarPrivate() {
 
   const signOut = () => {
     localStorage.removeItem("token");
-    navigate("/login");
+    navigate("");
   };
 
   return (

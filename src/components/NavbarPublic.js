@@ -4,7 +4,10 @@ import React from "react";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
+import { useNavigate } from "react-router";
+
 function NavbarPublic() {
+  let navigate = useNavigate();
   return (
     <Navbar
       expand="lg"
@@ -17,7 +20,7 @@ function NavbarPublic() {
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="ms-auto">
-            <Nav.Link>
+            <Nav.Link onClick={(e) => navigate("/login")}>
               <FontAwesomeIcon icon={faSignIn} style={{ marginRight: "5px" }} />
               Login
             </Nav.Link>
