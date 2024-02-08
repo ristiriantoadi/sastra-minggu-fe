@@ -30,7 +30,7 @@ function Dashboard() {
             <Card.Title>Pencarian</Card.Title>
             <Form>
               <Row className="row">
-                <Col md={6} style={{ marginBottom: "25px" }}>
+                <Col md={6} style={{ marginBottom: "10px" }}>
                   <Form.Group>
                     <Form.Label>Judul</Form.Label>
                     <Form.Control type="text"></Form.Control>
@@ -45,7 +45,7 @@ function Dashboard() {
               </Row>
               <Row>
                 <Col md={6}>
-                  <Form.Group style={{ marginBottom: "25px" }}>
+                  <Form.Group style={{ marginBottom: "10px" }}>
                     <Form.Label>Jenis</Form.Label>
                     <Form.Select aria-label="Default select example">
                       <option value="1">Semua</option>

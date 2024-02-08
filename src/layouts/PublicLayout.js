@@ -1,4 +1,5 @@
 import React from "react";
+import { Container } from "react-bootstrap";
 import { Navigate, Outlet } from "react-router-dom";
 import NavbarPublic from "../components/NavbarPublic";
 
@@ -7,7 +8,9 @@ function PublicLayout() {
   return (
     <div>
       <NavbarPublic></NavbarPublic>
-      {token ? <Navigate to="/dashboard"></Navigate> : <Outlet />}
+      <Container style={{ maxWidth: "90%", paddingTop: "20px" }}>
+        {token ? <Navigate to="/dashboard"></Navigate> : <Outlet />}
+      </Container>
     </div>
   );
 }

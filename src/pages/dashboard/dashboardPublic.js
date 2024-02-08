@@ -11,7 +11,7 @@ import {
 function DashboardPublic() {
   return (
     <Container>
-      <Row style={{ marginTop: "10px" }}>
+      <Row style={{ marginBottom: "10px" }}>
         <Card fluid>
           <Card.Body>
             <Card.Title>Pencarian</Card.Title>
