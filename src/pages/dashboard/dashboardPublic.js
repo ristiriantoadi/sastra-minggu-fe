@@ -1,4 +1,6 @@
-import React from "react";
+import moment from "moment";
+import "moment/locale/id";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Card,
@@ -8,7 +10,41 @@ import {
   Row,
   Table,
 } from "react-bootstrap";
+import { Link } from "react-router-dom";
+import { publicAxios } from "../../util/util-axios";
+
 function DashboardPublic() {
+  const [works, setWorks] = useState([]);
+  moment.locale("id");
+
+  useEffect(() => {
+    publicAxios
+      .get(`/guest/work?dir=-1`)
+      .then((response) => {
+        // handle success
+        setWorks(response.data.content);
+      })
+      .catch(function (error) {
+        // handle error
+        console.log(error);
+      });
+  }, []);
+
+  const mapWorkType = (workType) => {
+    if (workType === "ESSAY") {
+      return "Esai";
+    } else if (workType === "SHORT_STORY") {
+      return "Cerita Pendek";
+    } else {
+      return "Puisi";
+    }
+  };
+  const mapPublicationDate = (publicationDate) => {
+    var date = moment(publicationDate);
+    var formattedDate = date.format("dddd, D MMMM YYYY");
+    return formattedDate;
+  };
+
   return (
     <Container>
       <Row style={{ marginBottom: "10px" }}>
@@ -81,7 +117,22 @@ function DashboardPublic() {
               <th>Bukti Pemuatan</th>
             </tr>
           </thead>
-          <tbody></tbody>
+          <tbody>
+            {works.map((work) => (
+              <tr key={work._id}>
+                <td>{work.title}</td>
+                <td>{work.author}</td>
+                <td>{mapWorkType(work.workType)}</td>
+                <td>{work.media}</td>
+                <td>{mapPublicationDate(work.publicationDate)}</td>
+                <td>
+                  <Link target="_blank" to={work.publicationProof}>
+                    Link
+                  </Link>
+                </td>
+              </tr>
+            ))}
+          </tbody>
         </Table>
       </Row>
     </Container>
