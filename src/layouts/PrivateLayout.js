@@ -14,14 +14,24 @@ function PrivateLayout() {
     privateAxios
       .get("/member/notif/count")
       .then((response) => {
-        console.log(location.pathname);
         setCountNotif(response.data.count);
       })
       .catch();
   }, []);
 
+  const resetCountNotif = () => {
+    privateAxios
+      .put("/member/notif/reset_count")
+      .then((response) => {
+        setCountNotif(0);
+      })
+      .catch();
+  };
+
   useEffect(() => {
-    console.log("pathName", location.pathname);
+    if (location.pathname === "/karya-saya") {
+      resetCountNotif();
+    }
   });
 
   return (
@@ -49,7 +59,8 @@ function PrivateLayout() {
                   to="/karya-saya"
                 >
                   <Nav.Item>
-                    Karya Saya <Badge bg="primary">{countNotif}</Badge>
+                    Karya Saya{" "}
+                    {countNotif > 0 && <Badge bg="primary">{countNotif}</Badge>}
                   </Nav.Item>
                 </Link>
               </ListGroup.Item>
