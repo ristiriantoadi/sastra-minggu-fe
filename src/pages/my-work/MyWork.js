@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { Container, Row, Table } from "react-bootstrap";
 import { Link, useSearchParams } from "react-router-dom";
+import PaginationComponent from "../../components/PaginationComponent";
 import { privateAxios } from "../../util/util-axios";
 import { mapPublicationDate, mapWorkType } from "../../util/util-work";
 
 function MyWork() {
   const [searchParams] = useSearchParams();
   const [works, setWorks] = useState([]);
+  const [totalPages, setTotalPages] = useState();
 
   useEffect(() => {
     let currentPage = searchParams.get("page") || 1;
@@ -14,7 +16,7 @@ function MyWork() {
       .get("/member/work/my_work?page=" + (currentPage - 1))
       .then((response) => {
         setWorks(response.data.content);
-        // setTotalPages(response.data.totalPages);
+        setTotalPages(response.data.totalPages);
       })
       .catch(function (error) {
         // handle error
@@ -50,6 +52,9 @@ function MyWork() {
             ))}
           </tbody>
         </Table>
+      </Row>
+      <Row>
+        <PaginationComponent totalPages={totalPages} />
       </Row>
     </Container>
   );
