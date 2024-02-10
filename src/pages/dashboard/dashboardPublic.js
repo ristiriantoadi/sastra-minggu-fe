@@ -1,5 +1,3 @@
-import moment from "moment";
-import "moment/locale/id";
 import React, { useEffect, useState } from "react";
 import {
   Button,
@@ -12,10 +10,10 @@ import {
 } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { publicAxios } from "../../util/util-axios";
+import { mapPublicationDate, mapWorkType } from "../../util/util-work";
 
 function DashboardPublic() {
   const [works, setWorks] = useState([]);
-  moment.locale("id");
 
   useEffect(() => {
     publicAxios
@@ -29,21 +27,6 @@ function DashboardPublic() {
         console.log(error);
       });
   }, []);
-
-  const mapWorkType = (workType) => {
-    if (workType === "ESSAY") {
-      return "Esai";
-    } else if (workType === "SHORT_STORY") {
-      return "Cerita Pendek";
-    } else {
-      return "Puisi";
-    }
-  };
-  const mapPublicationDate = (publicationDate) => {
-    var date = moment(publicationDate);
-    var formattedDate = date.format("dddd, D MMMM YYYY");
-    return formattedDate;
-  };
 
   return (
     <Container>

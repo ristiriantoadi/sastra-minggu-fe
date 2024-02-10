@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Card,
@@ -9,10 +9,17 @@ import {
   Row,
   Table,
 } from "react-bootstrap";
+import { Link } from "react-router-dom";
+import { privateAxios } from "../../util/util-axios";
+import { mapPublicationDate, mapWorkType } from "../../util/util-work";
+
+import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 function Dashboard() {
   const [show, setShow] = useState(false);
   const [proofPublication, setProofPublication] = useState("link");
+  const [works, setWorks] = useState([]);
 
   const handleClose = () => {
     setShow(false);
@@ -20,6 +27,40 @@ function Dashboard() {
 
   const handleOpen = () => {
     setShow(true);
+  };
+
+  useEffect(() => {
+    privateAxios
+      .get("/member/work?dir=-1")
+      .then((response) => {
+        // handle success
+        setWorks(response.data.content);
+      })
+      .catch(function (error) {
+        // handle error
+        console.log("error in useeffect", error);
+      });
+  }, []);
+
+  const renderActionButtons = () => {
+    return (
+      <div>
+        <Button variant="warning" style={{ marginRight: "5px" }}>
+          <FontAwesomeIcon
+            style={{ marginRight: "5px" }}
+            icon={faEdit}
+          ></FontAwesomeIcon>
+          <span>Edit</span>
+        </Button>
+        <Button variant="danger">
+          <FontAwesomeIcon
+            style={{ marginRight: "5px" }}
+            icon={faTrash}
+          ></FontAwesomeIcon>
+          Delete
+        </Button>
+      </div>
+    );
   };
 
   return (
@@ -180,9 +221,42 @@ function Dashboard() {
               <th>Media</th>
               <th>Tanggal Terbit</th>
               <th>Bukti Pemuatan</th>
+              <th>Aksi</th>
             </tr>
           </thead>
-          <tbody></tbody>
+          <tbody>
+            {works.map((work) => (
+              <tr key={work._id}>
+                <td>{work.title}</td>
+                <td>{work.author}</td>
+                <td>{mapWorkType(work.workType)}</td>
+                <td>{work.media}</td>
+                <td>{mapPublicationDate(work.publicationDate)}</td>
+                <td>
+                  <Link target="_blank" to={work.publicationProof}>
+                    Link
+                  </Link>
+                </td>
+                <td>
+                  {/* <Button variant="warning" style={{ marginRight: "5px" }}>
+                    <FontAwesomeIcon
+                      style={{ marginRight: "5px" }}
+                      icon={faEdit}
+                    ></FontAwesomeIcon>
+                    <span>Edit</span>
+                  </Button>
+                  <Button disabled={true} variant="danger">
+                    <FontAwesomeIcon
+                      style={{ marginRight: "5px" }}
+                      icon={faTrash}
+                    ></FontAwesomeIcon>
+                    Delete
+                  </Button> */}
+                  {work.isEditable === true && renderActionButtons()}
+                </td>
+              </tr>
+            ))}
+          </tbody>
         </Table>
       </Row>
     </Container>
