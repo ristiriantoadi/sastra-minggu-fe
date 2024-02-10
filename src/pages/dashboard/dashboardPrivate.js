@@ -84,7 +84,7 @@ function Dashboard() {
     closeModalAddWork();
   };
 
-  const searchWorks = () => {
+  const buildQueryParams = () => {
     let params = "";
     if (searchTitle) {
       params += `&title=${searchTitle}`;
@@ -113,7 +113,7 @@ function Dashboard() {
             <Form
               onSubmit={(e) => {
                 e.preventDefault();
-                searchWorks();
+                buildQueryParams();
               }}
             >
               <Row className="row">
@@ -150,7 +150,7 @@ function Dashboard() {
                         setSearchWorkType(e.target.value);
                       }}
                     >
-                      <option value={null}>Semua</option>
+                      <option value={""}>Semua</option>
                       <option value="SHORT_STORY">Cerita Pendek</option>
                       <option value="POETRY">Puisi</option>
                       <option value="ESSAY">Esai</option>

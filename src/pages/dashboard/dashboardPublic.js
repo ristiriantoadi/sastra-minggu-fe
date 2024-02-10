@@ -17,20 +17,44 @@ function DashboardPublic() {
   const [works, setWorks] = useState([]);
   const [totalPages, setTotalPages] = useState();
   const [searchParams] = useSearchParams();
+  const [searchTitle, setSearchTitle] = useState();
+  const [searchAuthor, setSearchAuthor] = useState();
+  const [searchWorkType, setSearchWorkType] = useState();
+  const [searchMedia, setSearchMedia] = useState();
+  const [searchStartDate, setSearchStartDate] = useState();
+  const [searchEndDate, setSearchEndDate] = useState();
+  const [queryParams, setQueryParams] = useState("");
 
   useEffect(() => {
     let currentPage = searchParams.get("page") || 1;
     publicAxios
-      .get(`/guest/work?page=${currentPage - 1}`)
+      .get(`/guest/work?page=${currentPage - 1}` + queryParams)
       .then((response) => {
-        // handle success
         setWorks(response.data.content);
         setTotalPages(response.data.totalPages);
       })
-      .catch(function (error) {
-        // handle error
-      });
-  }, [searchParams]);
+      .catch(function (error) {});
+  }, [searchParams, queryParams]);
+
+  const buildQueryParams = () => {
+    let params = "";
+    if (searchTitle) {
+      params += `&title=${searchTitle}`;
+    }
+    if (searchAuthor) {
+      params += `&author=${searchAuthor}`;
+    }
+    if (searchWorkType) {
+      params += `&workType=${searchWorkType}`;
+    }
+    if (searchMedia) {
+      params += `&media=${searchMedia}`;
+    }
+    if (searchStartDate && searchEndDate) {
+      params += `&startDate=${searchStartDate}&endDate=${searchEndDate}`;
+    }
+    setQueryParams(params);
+  };
 
   return (
     <Container>
@@ -38,18 +62,33 @@ function DashboardPublic() {
         <Card fluid>
           <Card.Body>
             <Card.Title>Pencarian</Card.Title>
-            <Form>
+            <Form
+              onSubmit={(e) => {
+                e.preventDefault();
+                buildQueryParams();
+              }}
+            >
               <Row className="row">
                 <Col md={6} style={{ marginBottom: "1px" }}>
                   <Form.Group>
                     <Form.Label>Judul</Form.Label>
-                    <Form.Control type="text"></Form.Control>
+                    <Form.Control
+                      type="text"
+                      onChange={(e) => {
+                        setSearchTitle(e.target.value);
+                      }}
+                    ></Form.Control>
                   </Form.Group>
                 </Col>
                 <Col md={6}>
                   <Form.Group>
                     <Form.Label>Pengarang</Form.Label>
-                    <Form.Control type="text"></Form.Control>
+                    <Form.Control
+                      type="text"
+                      onChange={(e) => {
+                        setSearchAuthor(e.target.value);
+                      }}
+                    ></Form.Control>
                   </Form.Group>
                 </Col>
               </Row>
@@ -57,18 +96,28 @@ function DashboardPublic() {
                 <Col md={6}>
                   <Form.Group style={{ marginBottom: "1px" }}>
                     <Form.Label>Jenis</Form.Label>
-                    <Form.Select aria-label="Default select example">
-                      <option value="1">Semua</option>
-                      <option value="1">Cerita Pendek</option>
-                      <option value="2">Puisi</option>
-                      <option value="3">Esai</option>
+                    <Form.Select
+                      aria-label="Default select example"
+                      onChange={(e) => {
+                        setSearchWorkType(e.target.value);
+                      }}
+                    >
+                      <option value="">Semua</option>
+                      <option value="SHORT_STORY">Cerita Pendek</option>
+                      <option value="POETRY">Puisi</option>
+                      <option value="ESSAY">Esai</option>
                     </Form.Select>
                   </Form.Group>
                 </Col>
                 <Col md={6}>
                   <Form.Group>
                     <Form.Label>Media</Form.Label>
-                    <Form.Control type="text"></Form.Control>
+                    <Form.Control
+                      onChange={(e) => {
+                        setSearchMedia(e.target.value);
+                      }}
+                      type="text"
+                    ></Form.Control>
                   </Form.Group>
                 </Col>
               </Row>
@@ -77,16 +126,28 @@ function DashboardPublic() {
                   <Form.Label>Tanggal Pemuatan</Form.Label>
                   <Row>
                     <Col md={6} style={{ marginBottom: "10px" }}>
-                      <Form.Control type="date"></Form.Control>
+                      <Form.Control
+                        onChange={(e) => {
+                          setSearchStartDate(e.target.value);
+                        }}
+                        type="date"
+                      ></Form.Control>
                     </Col>
                     <Col md={6}>
-                      <Form.Control type="date"></Form.Control>
+                      <Form.Control
+                        onChange={(e) => {
+                          setSearchEndDate(e.target.value);
+                        }}
+                        type="date"
+                      ></Form.Control>
                     </Col>
                   </Row>
                 </Form.Group>
               </Row>
               <Row>
-                <Button variant="success">Cari</Button>
+                <Button type="submit" variant="success">
+                  Cari
+                </Button>
               </Row>
             </Form>
           </Card.Body>
