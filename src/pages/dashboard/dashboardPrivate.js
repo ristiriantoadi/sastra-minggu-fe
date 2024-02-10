@@ -37,6 +37,7 @@ function Dashboard() {
   const [searchMedia, setSearchMedia] = useState();
   const [searchStartDate, setSearchStartDate] = useState();
   const [searchEndDate, setSearchEndDate] = useState();
+  const [queryParams, setQueryParams] = useState("");
 
   const closeModalAddWork = () => {
     setShow(false);
@@ -49,7 +50,7 @@ function Dashboard() {
   useEffect(() => {
     let currentPage = searchParams.get("page") || 1;
     privateAxios
-      .get("/member/work?page=" + (currentPage - 1))
+      .get("/member/work?page=" + (currentPage - 1) + queryParams)
       .then((response) => {
         setWorks(response.data.content);
         setTotalPages(response.data.totalPages);
@@ -57,7 +58,7 @@ function Dashboard() {
       .catch(function (error) {
         // handle error
       });
-  }, [searchParams]);
+  }, [searchParams, queryParams]);
 
   const sendNewWork = async () => {
     const data = new FormData();
@@ -73,7 +74,6 @@ function Dashboard() {
     }
     const config = {
       headers: {
-        // Accept: "application/json",
         "Content-Type": "multipart/form-data",
       },
     };
@@ -84,7 +84,25 @@ function Dashboard() {
     closeModalAddWork();
   };
 
-  const searchWork = () => {};
+  const searchWorks = () => {
+    let params = "";
+    if (searchTitle) {
+      params += `&title=${searchTitle}`;
+    }
+    if (searchAuthor) {
+      params += `&author=${searchAuthor}`;
+    }
+    if (searchWorkType) {
+      params += `&workType=${searchWorkType}`;
+    }
+    if (searchMedia) {
+      params += `&media=${searchMedia}`;
+    }
+    if (searchStartDate && searchEndDate) {
+      params += `&startDate=${searchStartDate}&endDate=${searchEndDate}`;
+    }
+    setQueryParams(params);
+  };
 
   return (
     <Container>
@@ -95,8 +113,7 @@ function Dashboard() {
             <Form
               onSubmit={(e) => {
                 e.preventDefault();
-                // sendNewWork();
-                // searchWorks();
+                searchWorks();
               }}
             >
               <Row className="row">
@@ -133,10 +150,10 @@ function Dashboard() {
                         setSearchWorkType(e.target.value);
                       }}
                     >
-                      <option value="1">Semua</option>
-                      <option value="1">Cerita Pendek</option>
-                      <option value="2">Puisi</option>
-                      <option value="3">Esai</option>
+                      <option value={null}>Semua</option>
+                      <option value="SHORT_STORY">Cerita Pendek</option>
+                      <option value="POETRY">Puisi</option>
+                      <option value="ESSAY">Esai</option>
                     </Form.Select>
                   </Form.Group>
                 </Col>
@@ -176,7 +193,9 @@ function Dashboard() {
                 </Form.Group>
               </Row>
               <Row>
-                <Button variant="success">Cari</Button>
+                <Button type="submit" variant="success">
+                  Cari
+                </Button>
               </Row>
             </Form>
           </Card.Body>
