@@ -15,6 +15,8 @@ import { mapPublicationDate, mapWorkType } from "../../util/util-work";
 
 import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useSearchParams } from "react-router-dom";
+import PaginationComponent from "../../components/PaginationComponent";
 
 function Dashboard() {
   const [show, setShow] = useState(false);
@@ -27,6 +29,8 @@ function Dashboard() {
   const [publicationDate, setPublicationDate] = useState();
   const [publicationProofLink, setPublicationProofLink] = useState();
   const [publicationProofFile, setPublicationProofFile] = useState();
+  const [totalPages, setTotalPages] = useState();
+  const [searchParams] = useSearchParams();
 
   const closeModalAddWork = () => {
     setShow(false);
@@ -37,17 +41,19 @@ function Dashboard() {
   };
 
   useEffect(() => {
+    let currentPage = searchParams.get("page") || 1;
     privateAxios
-      .get("/member/work")
+      .get("/member/work?page=" + (currentPage - 1))
       .then((response) => {
         // handle success
         setWorks(response.data.content);
+        // setTotalElements(response.data.totalElements);
+        setTotalPages(response.data.totalPages);
       })
       .catch(function (error) {
         // handle error
-        console.log("error in useeffect", error);
       });
-  }, []);
+  }, [searchParams]);
 
   const sendNewWork = async () => {
     const data = new FormData();
@@ -319,6 +325,9 @@ function Dashboard() {
             ))}
           </tbody>
         </Table>
+      </Row>
+      <Row>
+        <PaginationComponent totalPages={totalPages} />
       </Row>
     </Container>
   );
