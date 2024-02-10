@@ -28,11 +28,11 @@ function Dashboard() {
   const [publicationProofLink, setPublicationProofLink] = useState();
   const [publicationProofFile, setPublicationProofFile] = useState();
 
-  const handleClose = () => {
+  const closeModalAddWork = () => {
     setShow(false);
   };
 
-  const handleOpen = () => {
+  const openModalAddWork = () => {
     setShow(true);
   };
 
@@ -49,50 +49,29 @@ function Dashboard() {
       });
   }, []);
 
-  const renderActionButtons = () => {
-    return (
-      <div>
-        <Button variant="warning" style={{ marginRight: "5px" }}>
-          <FontAwesomeIcon
-            style={{ marginRight: "5px" }}
-            icon={faEdit}
-          ></FontAwesomeIcon>
-          <span>Edit</span>
-        </Button>
-        <Button variant="danger">
-          <FontAwesomeIcon
-            style={{ marginRight: "5px" }}
-            icon={faTrash}
-          ></FontAwesomeIcon>
-          Delete
-        </Button>
-      </div>
-    );
-  };
-
   const sendNewWork = async () => {
-    const data = new URLSearchParams();
+    const data = new FormData();
     data.append("title", title);
     data.append("author", author);
     data.append("workType", workType);
     data.append("media", media);
     data.append("publicationDate", publicationDate);
-    if (publicationProofLink) {
-      data.append("publicationProofLink", publicationProofLink);
-    }
-    if (publicationProofFile) {
+    if (proofPublication === "image") {
       data.append("publicationProofFile", publicationProofFile);
+    } else {
+      data.append("publicationProofLink", publicationProofLink);
     }
     const config = {
       headers: {
-        Accept: "application/json",
-        "Content-Type": "application/x-www-form-urlencoded",
+        // Accept: "application/json",
+        "Content-Type": "multipart/form-data",
       },
     };
+    console.log("publication proof file", publicationProofFile);
     try {
       await privateAxios.post("/member/work", data, config);
     } catch (error) {}
-    handleClose();
+    closeModalAddWork();
   };
 
   return (
@@ -157,10 +136,10 @@ function Dashboard() {
       </Row>
       <Row>
         <Col>
-          <Button onClick={handleOpen} variant="primary">
+          <Button onClick={openModalAddWork} variant="primary">
             Tambah
           </Button>
-          <Modal size="xl" show={show} onHide={handleClose}>
+          <Modal size="xl" show={show} onHide={closeModalAddWork}>
             <Modal.Header closeButton>
               <Modal.Title>Tambah Karya</Modal.Title>
             </Modal.Header>
@@ -266,7 +245,7 @@ function Dashboard() {
                         <Form.Control
                           required
                           onChange={(e) => {
-                            setPublicationProofFile(e.target.value);
+                            setPublicationProofFile(e.target.files[0]);
                           }}
                           type="file"
                         ></Form.Control>
@@ -317,21 +296,24 @@ function Dashboard() {
                   </Link>
                 </td>
                 <td>
-                  {/* <Button variant="warning" style={{ marginRight: "5px" }}>
+                  <Button
+                    disabled={!work.isEditable}
+                    variant="warning"
+                    style={{ marginRight: "5px" }}
+                  >
                     <FontAwesomeIcon
                       style={{ marginRight: "5px" }}
                       icon={faEdit}
                     ></FontAwesomeIcon>
                     <span>Edit</span>
                   </Button>
-                  <Button disabled={true} variant="danger">
+                  <Button disabled={!work.isEditable} variant="danger">
                     <FontAwesomeIcon
                       style={{ marginRight: "5px" }}
                       icon={faTrash}
                     ></FontAwesomeIcon>
                     Delete
-                  </Button> */}
-                  {work.isEditable === true && renderActionButtons()}
+                  </Button>
                 </td>
               </tr>
             ))}
