@@ -16,6 +16,7 @@ import { mapPublicationDate, mapWorkType } from "../../util/util-work";
 import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useSearchParams } from "react-router-dom";
+import Swal from "sweetalert2";
 import PaginationComponent from "../../components/PaginationComponent";
 
 function Dashboard() {
@@ -179,6 +180,28 @@ function Dashboard() {
       setErrorProofLinkInvalid(false);
     }
   }, [publicationProofLink]);
+
+  const deleteWork = (workId) => {
+    Swal.fire({
+      title: "Anda yakin ingin menghapus data?",
+      showCancelButton: true,
+      confirmButtonText: "Ya",
+      confirmButtonColor: "#f44336",
+      denyButtonText: `Tidak`,
+    }).then((result) => {
+      /* Read more about isConfirmed, isDenied below */
+      if (result.isConfirmed) {
+        privateAxios
+          .delete(`/member/work/${workId}`)
+          .then((response) => {
+            fetchWork();
+          })
+          .catch();
+      } else if (result.isDenied) {
+        return;
+      }
+    });
+  };
 
   return (
     <Container>
@@ -468,7 +491,11 @@ function Dashboard() {
                     ></FontAwesomeIcon>
                     <span>Edit</span>
                   </Button>
-                  <Button disabled={!work.isEditable} variant="danger">
+                  <Button
+                    onClick={() => deleteWork(work._id)}
+                    disabled={!work.isEditable}
+                    variant="danger"
+                  >
                     <FontAwesomeIcon
                       style={{ marginRight: "5px" }}
                       icon={faTrash}
