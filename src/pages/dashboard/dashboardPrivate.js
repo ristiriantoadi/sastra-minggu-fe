@@ -147,22 +147,17 @@ function Dashboard() {
     setQueryParams(params);
   };
 
-  const fetchMembers = () => {
-    privateAxios
-      .get("/member/combo")
-      .then((response) => {
-        setMembers(response.data);
-      })
-      .catch();
-  };
-
   useEffect(() => {
     if (author === undefined) {
       return;
     }
     if (author.length >= 3) {
-      // fetch members
-      fetchMembers();
+      privateAxios
+        .get("/member/combo?name=" + author)
+        .then((response) => {
+          setMembers(response.data);
+        })
+        .catch();
     }
   }, [author]);
 

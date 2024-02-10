@@ -22,7 +22,7 @@ function PrivateLayout() {
   const resetCountNotif = () => {
     privateAxios
       .put("/member/notif/reset_count")
-      .then((response) => {
+      .then(() => {
         setCountNotif(0);
       })
       .catch();
