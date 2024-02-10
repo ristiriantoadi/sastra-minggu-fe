@@ -20,6 +20,13 @@ function Dashboard() {
   const [show, setShow] = useState(false);
   const [proofPublication, setProofPublication] = useState("link");
   const [works, setWorks] = useState([]);
+  const [title, setTitle] = useState();
+  const [author, setAuthor] = useState();
+  const [workType, setWorkType] = useState("SHORT_STORY");
+  const [media, setMedia] = useState();
+  const [publicationDate, setPublicationDate] = useState();
+  const [publicationProofLink, setPublicationProofLink] = useState();
+  const [publicationProofFile, setPublicationProofFile] = useState();
 
   const handleClose = () => {
     setShow(false);
@@ -31,7 +38,7 @@ function Dashboard() {
 
   useEffect(() => {
     privateAxios
-      .get("/member/work?dir=-1")
+      .get("/member/work")
       .then((response) => {
         // handle success
         setWorks(response.data.content);
@@ -61,6 +68,31 @@ function Dashboard() {
         </Button>
       </div>
     );
+  };
+
+  const sendNewWork = async () => {
+    const data = new URLSearchParams();
+    data.append("title", title);
+    data.append("author", author);
+    data.append("workType", workType);
+    data.append("media", media);
+    data.append("publicationDate", publicationDate);
+    if (publicationProofLink) {
+      data.append("publicationProofLink", publicationProofLink);
+    }
+    if (publicationProofFile) {
+      data.append("publicationProofFile", publicationProofFile);
+    }
+    const config = {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    };
+    try {
+      await privateAxios.post("/member/work", data, config);
+    } catch (error) {}
+    handleClose();
   };
 
   return (
@@ -133,18 +165,35 @@ function Dashboard() {
               <Modal.Title>Tambah Karya</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-              <Form>
+              <Form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  sendNewWork();
+                }}
+              >
                 <Row className="row">
                   <Col md={6} style={{ marginBottom: "10px" }}>
                     <Form.Group>
                       <Form.Label>Judul</Form.Label>
-                      <Form.Control type="text"></Form.Control>
+                      <Form.Control
+                        required
+                        onChange={(e) => {
+                          setTitle(e.target.value);
+                        }}
+                        type="text"
+                      ></Form.Control>
                     </Form.Group>
                   </Col>
                   <Col md={6}>
                     <Form.Group>
                       <Form.Label>Pengarang</Form.Label>
-                      <Form.Control type="text"></Form.Control>
+                      <Form.Control
+                        required
+                        onChange={(e) => {
+                          setAuthor(e.target.value);
+                        }}
+                        type="text"
+                      ></Form.Control>
                     </Form.Group>
                   </Col>
                 </Row>
@@ -152,17 +201,29 @@ function Dashboard() {
                   <Col md={6}>
                     <Form.Group style={{ marginBottom: "10px" }}>
                       <Form.Label>Jenis</Form.Label>
-                      <Form.Select aria-label="Default select example">
-                        <option value="1">Cerita Pendek</option>
-                        <option value="2">Puisi</option>
-                        <option value="3">Esai</option>
+                      <Form.Select
+                        value={workType}
+                        onChange={(e) => {
+                          setWorkType(e.target.value);
+                        }}
+                        aria-label="Default select example"
+                      >
+                        <option value="SHORT_STORY">Cerita Pendek</option>
+                        <option value="POETRY">Puisi</option>
+                        <option value="ESSAY">Esai</option>
                       </Form.Select>
                     </Form.Group>
                   </Col>
                   <Col md={6}>
                     <Form.Group>
                       <Form.Label>Media</Form.Label>
-                      <Form.Control type="text"></Form.Control>
+                      <Form.Control
+                        onChange={(e) => {
+                          setMedia(e.target.value);
+                        }}
+                        required
+                        type="text"
+                      ></Form.Control>
                     </Form.Group>
                   </Col>
                 </Row>
@@ -170,7 +231,13 @@ function Dashboard() {
                   <Col md={6}>
                     <Form.Group>
                       <Form.Label>Tanggal Pemuatan</Form.Label>
-                      <Form.Control type="date"></Form.Control>
+                      <Form.Control
+                        onChange={(e) => {
+                          setPublicationDate(e.target.value);
+                        }}
+                        required
+                        type="date"
+                      ></Form.Control>
                     </Form.Group>
                   </Col>
                   <Col md={6}>
@@ -196,15 +263,27 @@ function Dashboard() {
                         />
                       </div>
                       {proofPublication === "image" ? (
-                        <Form.Control type="file"></Form.Control>
+                        <Form.Control
+                          required
+                          onChange={(e) => {
+                            setPublicationProofFile(e.target.value);
+                          }}
+                          type="file"
+                        ></Form.Control>
                       ) : (
-                        <Form.Control type="text"></Form.Control>
+                        <Form.Control
+                          required
+                          onChange={(e) => {
+                            setPublicationProofLink(e.target.value);
+                          }}
+                          type="text"
+                        ></Form.Control>
                       )}
                     </Form.Group>
                   </Col>
                 </Row>
                 <div style={{ display: "flex", justifyContent: "flex-end" }}>
-                  <Button>Tambah</Button>
+                  <Button type="submit">Tambah</Button>
                 </div>
               </Form>
             </Modal.Body>

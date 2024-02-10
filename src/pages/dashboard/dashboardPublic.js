@@ -17,7 +17,7 @@ function DashboardPublic() {
 
   useEffect(() => {
     publicAxios
-      .get(`/guest/work?dir=-1`)
+      .get(`/guest/work`)
       .then((response) => {
         // handle success
         setWorks(response.data.content);
