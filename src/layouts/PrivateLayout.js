@@ -1,10 +1,28 @@
+import { useEffect, useState } from "react";
 import { Col, Container, ListGroup, Nav, Row } from "react-bootstrap";
+import Badge from "react-bootstrap/Badge";
 import { Link, Navigate, Outlet, useLocation } from "react-router-dom";
 import NavbarPrivate from "../components/NavbarPrivate";
+import { privateAxios } from "../util/util-axios";
 
 function PrivateLayout() {
   const token = localStorage.getItem("token");
   let location = useLocation();
+  const [countNotif, setCountNotif] = useState(0);
+
+  useEffect(() => {
+    privateAxios
+      .get("/member/notif/count")
+      .then((response) => {
+        console.log(location.pathname);
+        setCountNotif(response.data.count);
+      })
+      .catch();
+  }, []);
+
+  useEffect(() => {
+    console.log("pathName", location.pathname);
+  });
 
   return (
     <div>
@@ -30,7 +48,9 @@ function PrivateLayout() {
                   }
                   to="/karya-saya"
                 >
-                  <Nav.Item>Karya Saya</Nav.Item>
+                  <Nav.Item>
+                    Karya Saya <Badge bg="primary">{countNotif}</Badge>
+                  </Nav.Item>
                 </Link>
               </ListGroup.Item>
             </ListGroup>

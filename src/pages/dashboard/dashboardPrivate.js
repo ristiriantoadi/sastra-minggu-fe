@@ -41,6 +41,7 @@ function Dashboard() {
   const [queryParams, setQueryParams] = useState("");
   const [members, setMembers] = useState([]);
   const [errorProofLinkInvalid, setErrorProofLinkInvalid] = useState(false);
+
   const closeModalAddWork = () => {
     setShow(false);
   };
