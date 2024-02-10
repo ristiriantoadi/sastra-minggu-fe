@@ -38,6 +38,7 @@ function Dashboard() {
   const [searchStartDate, setSearchStartDate] = useState();
   const [searchEndDate, setSearchEndDate] = useState();
   const [queryParams, setQueryParams] = useState("");
+  const [members, setMembers] = useState([]);
 
   const closeModalAddWork = () => {
     setShow(false);
@@ -60,10 +61,31 @@ function Dashboard() {
       });
   }, [searchParams, queryParams]);
 
+  const getAuthorId = () => {
+    const regex = /\(@([^)]+)\)/;
+    const match = author.match(regex);
+    const username = match && match[1];
+    if (username === null) {
+      return;
+    }
+    const member = members.filter((member) => {
+      return member.username === username;
+    });
+    return member[0]["_id"];
+  };
+
+  const getAuthorName = () => {
+    const startIndex = author.indexOf("(");
+    const name = author.substring(0, startIndex).trim();
+    if (name === "") {
+      return author;
+    }
+    return name;
+  };
+
   const sendNewWork = async () => {
     const data = new FormData();
     data.append("title", title);
-    data.append("author", author);
     data.append("workType", workType);
     data.append("media", media);
     data.append("publicationDate", publicationDate);
@@ -72,12 +94,18 @@ function Dashboard() {
     } else {
       data.append("publicationProofLink", publicationProofLink);
     }
+    const authorId = getAuthorId();
+    if (authorId) {
+      data.append("authorId", authorId);
+    }
+    data.append("author", getAuthorName());
+
     const config = {
       headers: {
         "Content-Type": "multipart/form-data",
       },
     };
-    console.log("publication proof file", publicationProofFile);
+
     try {
       await privateAxios.post("/member/work", data, config);
     } catch (error) {}
@@ -103,6 +131,25 @@ function Dashboard() {
     }
     setQueryParams(params);
   };
+
+  const fetchMembers = () => {
+    privateAxios
+      .get("/member/combo")
+      .then((response) => {
+        setMembers(response.data);
+      })
+      .catch();
+  };
+
+  useEffect(() => {
+    if (author === undefined) {
+      return;
+    }
+    if (author.length >= 3) {
+      // fetch members
+      fetchMembers();
+    }
+  }, [author]);
 
   return (
     <Container>
@@ -234,12 +281,23 @@ function Dashboard() {
                     <Form.Group>
                       <Form.Label>Pengarang</Form.Label>
                       <Form.Control
+                        list="members"
                         required
                         onChange={(e) => {
                           setAuthor(e.target.value);
                         }}
                         type="text"
                       ></Form.Control>
+                      <datalist id="members">
+                        {members.map((member) => {
+                          return (
+                            <option
+                              key={member.id}
+                              value={`${member.name} (@${member.username}) `}
+                            />
+                          );
+                        })}
+                      </datalist>
                     </Form.Group>
                   </Col>
                 </Row>
