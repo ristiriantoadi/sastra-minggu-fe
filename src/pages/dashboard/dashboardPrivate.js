@@ -39,13 +39,26 @@ function Dashboard() {
   const [searchEndDate, setSearchEndDate] = useState();
   const [queryParams, setQueryParams] = useState("");
   const [members, setMembers] = useState([]);
-
+  const [errorProofLinkInvalid, setErrorProofLinkInvalid] = useState(false);
   const closeModalAddWork = () => {
     setShow(false);
   };
 
   const openModalAddWork = () => {
     setShow(true);
+  };
+
+  const fetchWork = () => {
+    let currentPage = searchParams.get("page") || 1;
+    privateAxios
+      .get("/member/work?page=" + (currentPage - 1) + queryParams)
+      .then((response) => {
+        setWorks(response.data.content);
+        setTotalPages(response.data.totalPages);
+      })
+      .catch(function (error) {
+        // handle error
+      });
   };
 
   useEffect(() => {
@@ -100,16 +113,16 @@ function Dashboard() {
     }
     data.append("author", getAuthorName());
 
-    const config = {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    };
-
     try {
+      const config = {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      };
       await privateAxios.post("/member/work", data, config);
     } catch (error) {}
     closeModalAddWork();
+    fetchWork();
   };
 
   const buildQueryParams = () => {
@@ -150,6 +163,22 @@ function Dashboard() {
       fetchMembers();
     }
   }, [author]);
+
+  useEffect(() => {
+    if (
+      publicationProofLink === undefined ||
+      publicationProofLink === "" ||
+      publicationProofLink == null
+    ) {
+      return;
+    }
+    const urlRegex = /^(ftp|http|https):\/\/[^ "]+$/;
+    if (urlRegex.test(publicationProofLink) === false) {
+      setErrorProofLinkInvalid(true);
+    } else {
+      setErrorProofLinkInvalid(false);
+    }
+  }, [publicationProofLink]);
 
   return (
     <Container>
@@ -375,13 +404,20 @@ function Dashboard() {
                           type="file"
                         ></Form.Control>
                       ) : (
-                        <Form.Control
-                          required
-                          onChange={(e) => {
-                            setPublicationProofLink(e.target.value);
-                          }}
-                          type="text"
-                        ></Form.Control>
+                        <div>
+                          <Form.Control
+                            required
+                            onChange={(e) => {
+                              setPublicationProofLink(e.target.value);
+                            }}
+                            type="text"
+                          ></Form.Control>
+                          {errorProofLinkInvalid && (
+                            <span style={{ color: "red", fontSize: "14px" }}>
+                              Link URL tidak valid
+                            </span>
+                          )}
+                        </div>
                       )}
                     </Form.Group>
                   </Col>
