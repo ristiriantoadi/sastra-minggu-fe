@@ -8,25 +8,29 @@ import {
   Row,
   Table,
 } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
+import PaginationComponentPublic from "../../components/PaginationComponentPublic";
 import { publicAxios } from "../../util/util-axios";
 import { mapPublicationDate, mapWorkType } from "../../util/util-work";
 
 function DashboardPublic() {
   const [works, setWorks] = useState([]);
+  const [totalPages, setTotalPages] = useState();
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
+    let currentPage = searchParams.get("page") || 1;
     publicAxios
-      .get(`/guest/work`)
+      .get(`/guest/work?page=${currentPage - 1}`)
       .then((response) => {
         // handle success
         setWorks(response.data.content);
+        setTotalPages(response.data.totalPages);
       })
       .catch(function (error) {
         // handle error
-        console.log(error);
       });
-  }, []);
+  }, [searchParams]);
 
   return (
     <Container>
@@ -117,6 +121,9 @@ function DashboardPublic() {
             ))}
           </tbody>
         </Table>
+      </Row>
+      <Row>
+        <PaginationComponentPublic totalPages={totalPages} />
       </Row>
     </Container>
   );
