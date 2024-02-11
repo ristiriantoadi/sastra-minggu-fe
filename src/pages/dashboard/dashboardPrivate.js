@@ -20,7 +20,7 @@ import Swal from "sweetalert2";
 import PaginationComponent from "../../components/PaginationComponent";
 
 function Dashboard() {
-  const [show, setShow] = useState(false);
+  const [showModalAddWork, setShowModalAddWork] = useState(false);
   const [proofPublication, setProofPublication] = useState("link");
   const [works, setWorks] = useState([]);
   const [title, setTitle] = useState();
@@ -41,13 +41,38 @@ function Dashboard() {
   const [queryParams, setQueryParams] = useState("");
   const [members, setMembers] = useState([]);
   const [errorProofLinkInvalid, setErrorProofLinkInvalid] = useState(false);
+  const [showModalEditWork, setShowModalEditWork] = useState(false);
+  const [editProofPublication, setEditProofPublication] = useState("link");
+  const [editPublicationProofLink, setEditPublicationProofLink] = useState();
+  const [editTitle, setEditTitle] = useState();
+  const [editAuthor, setEditAuthor] = useState();
+  const [editWorkType, setEditWorkType] = useState();
+  const [editMedia, setEditMedia] = useState();
+  const [editPublicationDate, setEditPublicationDate] = useState();
+  const [editPublicationProofFile, setEditPublicationProofFile] = useState();
+  const [editWorkId, setEditWorkId] = useState();
 
   const closeModalAddWork = () => {
-    setShow(false);
+    setShowModalAddWork(false);
   };
 
   const openModalAddWork = () => {
-    setShow(true);
+    setShowModalAddWork(true);
+  };
+
+  const closeModalEditWork = () => {
+    setShowModalEditWork(false);
+  };
+
+  const openModalEditWork = (work) => {
+    setShowModalEditWork(true);
+    setEditPublicationProofLink(work.publicationProof);
+    setEditTitle(work.title);
+    setEditAuthor(work.author);
+    setEditMedia(work.media);
+    setEditWorkType(work.workType);
+    setEditPublicationDate(work.publicationDate);
+    setEditWorkId(work._id);
   };
 
   const fetchWork = () => {
@@ -76,20 +101,22 @@ function Dashboard() {
       });
   }, [searchParams, queryParams]);
 
-  const getAuthorId = () => {
+  const getAuthorId = (author) => {
     const regex = /\(@([^)]+)\)/;
     const match = author.match(regex);
     const username = match && match[1];
     if (username === null) {
       return;
     }
+    console.log("username", username);
+    console.log("members", members);
     const member = members.filter((member) => {
       return member.username === username;
     });
     return member[0]["_id"];
   };
 
-  const getAuthorName = () => {
+  const getAuthorName = (author) => {
     const startIndex = author.indexOf("(");
     const name = author.substring(0, startIndex).trim();
     if (name === "") {
@@ -98,7 +125,7 @@ function Dashboard() {
     return name;
   };
 
-  const sendNewWork = async () => {
+  const addWork = async () => {
     const data = new FormData();
     data.append("title", title);
     data.append("workType", workType);
@@ -109,11 +136,11 @@ function Dashboard() {
     } else {
       data.append("publicationProofLink", publicationProofLink);
     }
-    const authorId = getAuthorId();
+    const authorId = getAuthorId(author);
     if (authorId) {
       data.append("authorId", authorId);
     }
-    data.append("author", getAuthorName());
+    data.append("author", getAuthorName(author));
 
     try {
       const config = {
@@ -153,13 +180,28 @@ function Dashboard() {
     }
     if (author.length >= 3) {
       privateAxios
-        .get("/member/combo?name=" + author)
+        .get("/member/combo?name=" + getAuthorName(author))
         .then((response) => {
+          console.log("list members", response.data);
           setMembers(response.data);
         })
         .catch();
     }
   }, [author]);
+
+  useEffect(() => {
+    if (editAuthor === undefined) {
+      return;
+    }
+    if (editAuthor.length >= 3) {
+      privateAxios
+        .get("/member/combo?name=" + getAuthorName(editAuthor))
+        .then((response) => {
+          setMembers(response.data);
+        })
+        .catch();
+    }
+  }, [editAuthor]);
 
   useEffect(() => {
     if (
@@ -197,6 +239,35 @@ function Dashboard() {
         return;
       }
     });
+  };
+
+  const editWork = async (workId) => {
+    const data = new FormData();
+    data.append("title", editTitle);
+    data.append("workType", editWorkType);
+    data.append("media", editMedia);
+    data.append("publicationDate", editPublicationDate);
+    if (proofPublication === "image") {
+      data.append("publicationProofFile", editPublicationProofFile);
+    } else {
+      data.append("publicationProofLink", editPublicationProofLink);
+    }
+    const authorId = getAuthorId(editAuthor);
+    if (authorId) {
+      data.append("authorId", authorId);
+    }
+    data.append("author", getAuthorName(editAuthor));
+
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      };
+      await privateAxios.put(`/member/work/${editWorkId}`, data, config);
+    } catch (error) {}
+    closeModalEditWork();
+    fetchWork();
   };
 
   return (
@@ -301,7 +372,7 @@ function Dashboard() {
           <Button onClick={openModalAddWork} variant="primary">
             Tambah
           </Button>
-          <Modal size="xl" show={show} onHide={closeModalAddWork}>
+          <Modal size="xl" show={showModalAddWork} onHide={closeModalAddWork}>
             <Modal.Header closeButton>
               <Modal.Title>Tambah Karya</Modal.Title>
             </Modal.Header>
@@ -309,7 +380,7 @@ function Dashboard() {
               <Form
                 onSubmit={(e) => {
                   e.preventDefault();
-                  sendNewWork();
+                  addWork();
                 }}
               >
                 <Row className="row">
@@ -447,6 +518,157 @@ function Dashboard() {
               </Form>
             </Modal.Body>
           </Modal>
+          <Modal size="xl" show={showModalEditWork} onHide={closeModalEditWork}>
+            <Modal.Header closeButton>
+              <Modal.Title>Edit Karya</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <Form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  editWork();
+                }}
+              >
+                <Row className="row">
+                  <Col md={6} style={{ marginBottom: "10px" }}>
+                    <Form.Group>
+                      <Form.Label>Judul</Form.Label>
+                      <Form.Control
+                        required
+                        type="text"
+                        value={editTitle}
+                        onChange={(e) => {
+                          setEditTitle(e.target.value);
+                        }}
+                      ></Form.Control>
+                    </Form.Group>
+                  </Col>
+                  <Col md={6}>
+                    <Form.Group>
+                      <Form.Label>Pengarang</Form.Label>
+                      <Form.Control
+                        list="members"
+                        required
+                        value={editAuthor}
+                        type="text"
+                        onChange={(e) => {
+                          setEditAuthor(e.target.value);
+                        }}
+                      ></Form.Control>
+                      <datalist id="members">
+                        {members.map((member) => {
+                          return (
+                            <option
+                              key={member.id}
+                              value={`${member.name} (@${member.username}) `}
+                            />
+                          );
+                        })}
+                      </datalist>
+                    </Form.Group>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col md={6}>
+                    <Form.Group style={{ marginBottom: "10px" }}>
+                      <Form.Label>Jenis</Form.Label>
+                      <Form.Select
+                        value={editWorkType}
+                        onChange={(e) => {
+                          setEditWorkType(e.target.value);
+                        }}
+                        aria-label="Default select example"
+                      >
+                        <option value="SHORT_STORY">Cerita Pendek</option>
+                        <option value="POETRY">Puisi</option>
+                        <option value="ESSAY">Esai</option>
+                      </Form.Select>
+                    </Form.Group>
+                  </Col>
+                  <Col md={6}>
+                    <Form.Group>
+                      <Form.Label>Media</Form.Label>
+                      <Form.Control
+                        value={editMedia}
+                        onChange={(e) => {
+                          setEditMedia(e.target.value);
+                        }}
+                        required
+                        type="text"
+                      ></Form.Control>
+                    </Form.Group>
+                  </Col>
+                </Row>
+                <Row className="row">
+                  <Col md={6}>
+                    <Form.Group>
+                      <Form.Label>Tanggal Pemuatan</Form.Label>
+                      <Form.Control
+                        value={editPublicationDate}
+                        onChange={(e) => {
+                          setEditPublicationDate(e.target.value);
+                        }}
+                        required
+                        type="date"
+                      ></Form.Control>
+                    </Form.Group>
+                  </Col>
+                  <Col md={6}>
+                    <Form.Group>
+                      <Form.Label>Bukti Pemuatan</Form.Label>
+                      <div style={{ display: "flex", marginBottom: "5px" }}>
+                        <Form.Check
+                          type="radio"
+                          label="Gambar"
+                          style={{ marginRight: "10px" }}
+                          onClick={() => {
+                            setEditProofPublication("image");
+                          }}
+                          checked={editProofPublication === "image"}
+                        />
+                        <Form.Check
+                          type="radio"
+                          label="Link"
+                          checked={editProofPublication === "link"}
+                          onClick={() => {
+                            setEditProofPublication("link");
+                          }}
+                        />
+                      </div>
+                      {editProofPublication === "image" ? (
+                        <Form.Control
+                          required
+                          onChange={(e) => {
+                            setEditPublicationProofFile(e.target.files[0]);
+                          }}
+                          type="file"
+                        ></Form.Control>
+                      ) : (
+                        <div>
+                          <Form.Control
+                            required
+                            value={editPublicationProofLink}
+                            onChange={(e) => {
+                              setEditPublicationProofLink(e.target.value);
+                            }}
+                            type="text"
+                          ></Form.Control>
+                          {errorProofLinkInvalid && (
+                            <span style={{ color: "red", fontSize: "14px" }}>
+                              Link URL tidak valid
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </Form.Group>
+                  </Col>
+                </Row>
+                <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                  <Button type="submit">Edit</Button>
+                </div>
+              </Form>
+            </Modal.Body>
+          </Modal>
         </Col>
       </Row>
       <Row>
@@ -480,6 +702,7 @@ function Dashboard() {
                     disabled={!work.isEditable}
                     variant="warning"
                     style={{ marginRight: "5px" }}
+                    onClick={() => openModalEditWork(work)}
                   >
                     <FontAwesomeIcon
                       style={{ marginRight: "5px" }}
